@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  MENTOR
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  phone     String?
+  cvPath    String?
+  avatar    String?
+  github    String?
+  bio       String?
+  skills    String[]
+  role      Role     @default(USER)
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  ideas    Idea[]
+  comments Comment[]
+  likes    IdeaLike[]
+
+  @@map("users")
+}
+
+model Idea {
+  id              String   @id @default(cuid())
+  title           String
+  description     String   @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tags            String[]
+  status          String   @default("En discussion")
+  mentorValidated Boolean  @default(false)
+
+  // Relations
+  author   User       @relation(fields: [authorId], references: [id])
+  authorId String
+  comments Comment[]
+  likes    IdeaLike[]
+
+  @@map("ideas")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+  idea     Idea   @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  ideaId   String
+
+  @@map("comments")
+}
+
+model IdeaLike {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  ideaId    String
+  createdAt DateTime @default(now())
+
+  @@id([userId, ideaId])
+  @@map("idea_likes")
+}
