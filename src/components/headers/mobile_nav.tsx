@@ -12,7 +12,7 @@ export function MobileNav() {
 
   return (
     <nav className=" overflow-hidden fixed bottom-0 left-0 right-0 z-50 bg-primary-foreground border-t md:hidden">
-      <div className="flex justify-around gap-1">
+      <div className="flex justify-around gap-1 items-center">
         {mobileMenuItems.map((item) => (
           <Link
             prefetch
