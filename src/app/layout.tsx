@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/headers/header";
-import LandingHeader from "@/components/headers/landing_header";
 import { ThemeProvider } from "@/components/theme_provider";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import {SessionProvider} from "next-auth/react";
+
 
 const roboto = Roboto({ subsets: ["latin"], style: "normal", weight: ["100", "300", "400", "500", "700"] });
 
@@ -19,19 +20,26 @@ export default function RootLayout({
 }>) {
 
   return (
+
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${roboto.className} antialiased flex items-center justify-center flex-col min-h-screen bg-primary-foreground`}
       >
+      <SessionProvider>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+
           {children}
+
         </ThemeProvider>
+      </SessionProvider>
+
       </body>
     </html>
+
   );
 }

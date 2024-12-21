@@ -19,11 +19,9 @@ export default function LandingPage() {
             </p>
             <div className="space-x-4">
               <Button size="lg" asChild>
-                <Link href="/register">Get Started</Link>
+                <Link href="/ideas">Get Started</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="#learn-more">Learn More</Link>
-              </Button>
+
             </div>
           </div>
         </section>
