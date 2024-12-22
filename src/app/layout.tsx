@@ -22,7 +22,7 @@ export default async function RootLayout({
 }>) {
 
   const session = await auth()
-  if (session?.user?.onboardingCompleted === false) redirect('/onboarding')
+  if (session?.user?.onboardingCompleted === false) return redirect('/onboarding')
 
   return (
 

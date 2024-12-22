@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url))
   }
 
-  if (!session.user?.onboardingCompleted && request.nextUrl.pathname !== "/onboarding") {
+  if (!session.user?.onboardingCompleted) {
     return NextResponse.redirect(new URL("/onboarding", request.url))
   }
 
