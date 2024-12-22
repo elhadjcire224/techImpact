@@ -4,6 +4,8 @@ import { SessionProvider } from "next-auth/react";
 import { Roboto } from "next/font/google";
 import { Toaster } from 'react-hot-toast';
 import "./globals.css";
+import { auth } from "./auth";
+import { redirect } from "next/navigation";
 
 
 const roboto = Roboto({ subsets: ["latin"], style: "normal", weight: ["100", "300", "400", "500", "700"] });
@@ -13,11 +15,14 @@ export const metadata: Metadata = {
   description: "techImpact",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const session = await auth()
+  if (session?.user?.onboardingCompleted === false) redirect('/onboarding')
 
   return (
 
