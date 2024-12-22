@@ -1,6 +1,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getInitials } from "@/lib/utils"
 import { SignOut } from "./auth/signout_button"
 import { Button } from "./ui/button"
