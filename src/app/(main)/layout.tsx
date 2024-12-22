@@ -15,12 +15,17 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { auth } from "../auth"
+import { redirect } from "next/navigation"
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await auth()
+  if (!session) return redirect('/')
+  if (session.user.onboardingCompleted === false) return redirect('/onboarding')
   return (
     <SidebarProvider>
       <AppSidebar />

@@ -21,8 +21,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const session = await auth()
-  if (session?.user?.onboardingCompleted === false) return redirect('/onboarding')
+
 
   return (
 
