@@ -1,7 +1,7 @@
 import { signOut } from "@/app/auth"
 import { Button } from "../ui/button"
 import { LogOut } from "lucide-react"
-import { signOutAction } from "@/lib/actions"
+import { signOutAction } from "@/lib/actions/auth.actions"
 
 export function SignOut() {
   return (

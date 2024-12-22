@@ -59,8 +59,8 @@ enum Role {
 }
 
 model User {
-  id                  String    @id @default(cuid())
-  email               String    @unique
+  id                  String      @id @default(cuid())
+  email               String      @unique
   name                String?
   image               String?
   phone               String?
@@ -68,11 +68,12 @@ model User {
   github              String?
   portfolio           String?
   bio                 String?
-  onboardingCompleted Boolean   @default(false)
-  role                Role      @default(USER)
-  updatedAt           DateTime  @updatedAt
+  onboardingCompleted Boolean     @default(false)
+  role                Role        @default(USER)
+  updatedAt           DateTime    @updatedAt
   emailVerified       DateTime?
-  createdAt           DateTime  @default(now())
+  createdAt           DateTime    @default(now())
+  skills              UserSkill[]
 
   // Relations
   ideas          Idea[]
@@ -83,6 +84,16 @@ model User {
   mentorRequests MentorRequest[]
 
   @@map("users")
+}
+
+model UserSkill {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  skill     String
+  createdAt DateTime @default(now())
+
+  @@id([userId, skill])
+  @@map("user_skills")
 }
 
 model Idea {

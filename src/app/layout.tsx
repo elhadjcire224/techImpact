@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
-import "./globals.css";
 import { ThemeProvider } from "@/components/theme_provider";
+import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
+import { Roboto } from "next/font/google";
+import { Toaster } from 'react-hot-toast';
+import "./globals.css";
 
 
 const roboto = Roboto({ subsets: ["latin"], style: "normal", weight: ["100", "300", "400", "500", "700"] });
@@ -24,7 +25,7 @@ export default function RootLayout({
       <body
         className={`${roboto.className} antialiased flex items-center justify-center flex-col min-h-screen bg-primary-foreground`}
       >
-        <SessionProvider>
+        <SessionProvider refetchInterval={2}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -33,7 +34,7 @@ export default function RootLayout({
           >
 
             {children}
-
+            <Toaster />
           </ThemeProvider>
         </SessionProvider>
 
