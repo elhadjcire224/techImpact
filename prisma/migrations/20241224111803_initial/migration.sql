@@ -72,7 +72,7 @@ CREATE TABLE "ideas" (
     "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "status" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'In Discussion',
     "mentorValidated" BOOLEAN NOT NULL DEFAULT false,
     "authorId" TEXT NOT NULL,
 
@@ -80,11 +80,11 @@ CREATE TABLE "ideas" (
 );
 
 -- CreateTable
-CREATE TABLE "idea_tags" (
+CREATE TABLE "tags" (
     "id" TEXT NOT NULL,
     "label" TEXT NOT NULL,
 
-    CONSTRAINT "idea_tags_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "tags_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -140,7 +140,7 @@ CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "idea_tags_label_key" ON "idea_tags"("label");
+CREATE UNIQUE INDEX "tags_label_key" ON "tags"("label");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "mentor_requests_userId_key" ON "mentor_requests"("userId");
@@ -179,4 +179,4 @@ ALTER TABLE "mentor_requests" ADD CONSTRAINT "mentor_requests_userId_fkey" FOREI
 ALTER TABLE "_IdeaToTag" ADD CONSTRAINT "_IdeaToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "ideas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_IdeaToTag" ADD CONSTRAINT "_IdeaToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "idea_tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_IdeaToTag" ADD CONSTRAINT "_IdeaToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;

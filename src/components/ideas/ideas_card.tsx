@@ -81,6 +81,7 @@ export function IdeaCard({ idea: {
             {tags.map((tag) => (
               <Badge key={tag.id} variant="outline" className="bg-sky-500/5 text-sky-500">
                 {tag.label}
+
               </Badge>
             ))}
           </div>

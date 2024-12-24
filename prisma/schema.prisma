@@ -102,8 +102,7 @@ model Idea {
   description     String   @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  tags            Tag[]
-  status          String
+  status          String   @default("In Discussion")
   mentorValidated Boolean  @default(false)
 
   // Relations
@@ -111,17 +110,30 @@ model Idea {
   authorId String
   comments Comment[]
   likes    IdeaLike[]
+  // La relation tags avec une table explicite de jointure
+  tags     IdeaTag[]
 
   @@map("ideas")
 }
 
 model Tag {
-  id    String @id @default(cuid())
-  label String @unique
-
-  ideas Idea[]
+  id    String    @id @default(cuid())
+  label String    @unique
+  // Relation vers IdeaTag
+  ideas IdeaTag[]
 
   @@map("idea_tags")
+}
+
+// Table de jointure explicite
+model IdeaTag {
+  idea   Idea   @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  ideaId String
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  String
+
+  @@id([ideaId, tagId])
+  @@map("idea_to_tags")
 }
 
 model Comment {
