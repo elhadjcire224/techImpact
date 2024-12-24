@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -18,7 +18,7 @@ import { ArrowLeft, Sparkles } from "lucide-react"
 
 const formSchema = z.object({
     title: z.string().min(10, "Title must be at least 10 characters"),
-    description: z.string().min(50, "Description must be at least 50 characters"),
+    description: z.string().min(50, "Description must be at least 20 characters"),
     tags: z.array(z.string()).min(1, "Select at least one tag"),
 })
 
@@ -36,10 +36,7 @@ export default function CreateIdeasPage() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        if (!session.data?.user?.id) {
-            toast.error("You must be logged in to create an idea")
-            return
-        }
+        console.log('session client', session)
         try {
             await createIdea({ ...values, authorId: session.data?.user.id! })
             toast.success("Idea created successfully!")

@@ -1,5 +1,6 @@
 "use server"
 
+import { auth } from "@/app/auth";
 import prisma from "@/db/prisma";
 import { IdeaStatus } from "@/types/ideas_types";
 import { revalidatePath } from "next/cache";
@@ -100,7 +101,11 @@ export async function createIdea({
   description: string;
   tags: string[];
   authorId: string;
-}): Promise<CreateIdeaResult> {
+}) {
+
+  const session = await auth()
+  console.log('session server', session)
+  if (!session) return
   try {
     const idea = await prisma.idea.create({
       data: {
