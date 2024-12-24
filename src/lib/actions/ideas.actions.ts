@@ -221,3 +221,130 @@ export async function toggleLike(ideaId: string) {
     throw error
   }
 }
+
+export async function addComment(ideaId: string, commentText: string): Promise<void> {
+  const session = await auth()
+  if (!session?.user) {
+    throw new Error('Not authenticated')
+  }
+
+  try {
+    await prisma.comment.create({
+      data: {
+        content: commentText,
+        ideaId: ideaId,
+        authorId: session.user.id,
+      },
+    });
+
+    revalidatePath(`/ideas/${ideaId}`);
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    throw error;
+  }
+}
+export interface DetailedIdeaResponse {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+  status: IdeaStatus;
+  mentorValidated: boolean;
+  authorId: string;
+  author: {
+    id: string;
+    name: string | null;
+    image: string;
+  };
+  tags: {
+    id: string;
+    label: string;
+  }[];
+  comments: {
+    id: string;
+    content: string;
+    createdAt: Date;
+    author: {
+      id: string;
+      name: string | null;
+      image: string | null;
+    };
+  }[];
+  _count: {
+    comments: number;
+    likes: number;
+  };
+  hasLiked: boolean;
+}
+export async function fetchIdeaById(ideaId: string) {
+
+  const userId = (await auth())?.user.id;
+
+  try {
+    const idea = await prisma.idea.findUnique({
+      where: { id: ideaId },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          }
+        },
+        tags: {
+          include: {
+            tag: {
+              select: {
+                id: true,
+                label: true
+              }
+            }
+          }
+        },
+        comments: {
+          include: {
+            author: {
+              select: {
+                id: true,
+                name: true,
+                image: true
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+            likes: true
+          }
+        },
+        likes: userId ? {
+          where: {
+            userId: userId
+          }
+        } : false
+      }
+    });
+
+    if (!idea) {
+      throw new Error('Idea not found');
+    }
+
+    return {
+      ...idea,
+      tags: idea.tags.map(t => ({
+        id: t.tag.id,
+        label: t.tag.label
+      })),
+      hasLiked: idea.likes ? idea.likes.length > 0 : false
+    };
+
+  } catch (error) {
+    console.error('Error fetching idea:', error);
+    throw error;
+  }
+}

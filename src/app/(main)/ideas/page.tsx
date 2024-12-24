@@ -7,6 +7,8 @@ import { useIdeasInfiniteScroll } from "@/hooks/use_infinite_ideas"
 import { useTags } from "@/hooks/use_tags"
 import Link from "next/link"
 import { useState } from "react"
+import { IdeaCardSkeleton } from "@/components/ideas/idea_card_skeleton"
+
 export default function IdeasPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,13 +41,20 @@ export default function IdeasPage() {
         toggleTag={toggleTag}
       />
       <div className=" grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {ideas.map((idea) => (
-          <IdeaCard key={idea.id} idea={idea} />
-        ))}
+        {isLoading ? (
+          // Show 6 skeleton cards while loading initial data
+          Array.from({ length: 3 }).map((_, i) => (
+            <IdeaCardSkeleton key={i} />
+          ))
+        ) : (
+          ideas.map((idea) => (
+            <IdeaCard key={idea.id} idea={idea} />
+          ))
+        )}
       </div>
 
       <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-        {isLoading && <div className="loading-spinner" />}
+
       </div>
     </div>
   )

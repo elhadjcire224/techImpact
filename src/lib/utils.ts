@@ -14,3 +14,5 @@ export function getInitials(name: string | null) {
   const firstTwoInitials = initials.slice(0, 2).join('').slice(0, 2);
   return firstTwoInitials;
 }
+
+
