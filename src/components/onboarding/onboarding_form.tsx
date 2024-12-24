@@ -37,7 +37,7 @@ interface OnboardingFormProps {
   defaultValues: {
     name: string
     email: string
-    image: string | null
+    image: string
   }
 }
 
@@ -323,7 +323,7 @@ export default function OnboardingForm({ defaultValues }: OnboardingFormProps) {
                         />
                       </FormControl>
                       <FormDescription>
-                        Enter your skills one by one. Press Enter or comma to add each skill.
+                        Enter your skills one by one. Press <strong className="text-blue-600">Enter</strong> or <strong className="text-blue-600">comma</strong> to add each skill.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
