@@ -95,7 +95,6 @@ export async function createIdea({
   title,
   description,
   tags,
-  authorId
 }: {
   title: string;
   description: string;
@@ -112,7 +111,7 @@ export async function createIdea({
         title,
         description,
         tags,
-        authorId,
+        authorId: session.user.id,
         status: IdeaStatus.InDiscussion
       },
       include: {

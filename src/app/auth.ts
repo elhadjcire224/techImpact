@@ -1,6 +1,7 @@
 
 import prisma from "@/db/prisma"
 import { getUserByEmailForJwt } from "@/db/queries/user_queries"
+import { UserRole } from "@/types/user_roles"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
@@ -19,19 +20,25 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
   callbacks: {
 
     async jwt({ token, account, profile }) {
-      console.log('jwt')
-      console.log('token', token)
-      console.log('account', account)
-      console.log('profile', profile)
       if (account && profile) {
-        const user = await getUserByEmailForJwt(account.email as string)
+        const user = await getUserByEmailForJwt(token.email as string);
 
-        // Ajouter ces informations au token
-        token.id = user?.id;
-        token.role = user?.role;
-        token.onboardingCompleted = user?.onboardingCompleted;
+        if (user) {
+          token.id = user.id;
+          token.role = user.role;
+          token.onboardingCompleted = user.onboardingCompleted;
+        }
       }
       return token;
     },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as UserRole;
+        session.user.onboardingCompleted = token.onboardingCompleted as boolean;
+      }
+      return session;
+    }
   }
 })
