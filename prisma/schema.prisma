@@ -60,7 +60,7 @@ enum Role {
 
 model User {
   id                  String      @id @default(cuid())
-  email               String      @unique
+  email               String
   name                String?
   image               String?
   phone               String?
@@ -71,7 +71,6 @@ model User {
   onboardingCompleted Boolean     @default(false)
   role                Role        @default(USER)
   updatedAt           DateTime    @updatedAt
-  emailVerified       DateTime?
   createdAt           DateTime    @default(now())
   skills              UserSkill[]
 
@@ -87,7 +86,7 @@ model User {
 }
 
 model UserSkill {
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   skill     String
   createdAt DateTime @default(now())
@@ -103,7 +102,7 @@ model Idea {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   tags            String[]
-  status          String   @default("En discussion")
+  status          String
   mentorValidated Boolean  @default(false)
 
   // Relations
@@ -113,6 +112,14 @@ model Idea {
   likes    IdeaLike[]
 
   @@map("ideas")
+}
+
+model IdeaTag {
+  ideaId String
+  tag    String
+
+  @@id([ideaId, tag])
+  @@map("idea_tags")
 }
 
 model Comment {
