@@ -1,23 +1,24 @@
 'use client'
 
+import { Logo } from "@/components/logo"
+import { NavUser } from "@/components/nav_user"
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from "@/components/ui/sidebar"
+import { cn } from '@/lib/utils'
+import { CircleUserRound, Home, Layers, Users } from 'lucide-react'
+import { useSession } from "next-auth/react"
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-import { Home, Layers, Users, CircleUserRound } from 'lucide-react'
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton, SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-} from "@/components/ui/sidebar"
-import { Logo } from "@/components/logo";
-import { NavUser } from "@/components/nav_user";
-import { useSession } from "next-auth/react";
 import { Separator } from './ui/separator'
 
 export const menuItems = [
@@ -72,4 +73,3 @@ export function AppSidebar() {
     </Sidebar>
   )
 }
-

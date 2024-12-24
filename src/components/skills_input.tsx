@@ -1,10 +1,9 @@
 "use client"
 
-import * as React from "react"
-import { X, Plus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { Input } from "./ui/input"
+import { X } from "lucide-react"
+import * as React from "react"
 
 interface SkillsInputProps {
   value: string[]
@@ -54,7 +53,7 @@ export default function SkillsInput({ value, onChange, className }: SkillsInputP
         <Badge
           key={skill}
           variant="secondary"
-          className="bg-background/10 text-foreground hover:bg-background/15 transition-colors"
+          className="text-foreground hover:bg-background/15 transition-colors"
         >
           {skill}
           <button
@@ -70,6 +69,7 @@ export default function SkillsInput({ value, onChange, className }: SkillsInputP
         ref={inputRef}
         value={input}
         onChange={handleInputChange}
+
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault()
