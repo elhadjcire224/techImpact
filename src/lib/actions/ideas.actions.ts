@@ -4,6 +4,7 @@
 import { auth } from "@/app/auth"
 import prisma from "@/db/prisma"
 import { IdeaStatus } from "@/types/ideas_types"
+import { UserRole } from "@/types/user_roles"
 import { revalidatePath } from "next/cache"
 
 interface FetchIdeasParams {
@@ -351,5 +352,84 @@ export async function fetchIdeaById(ideaId: string) {
   } catch (error) {
     console.error('Error fetching idea:', error);
     throw error;
+  }
+}
+
+export async function updateIdea(
+  ideaId: string,
+  {
+    title,
+    description,
+    tags,
+  }: {
+    title: string;
+    description: string;
+    tags: string[];
+  }
+) {
+  const session = await auth()
+  if (!session?.user) {
+    throw new Error('Not authenticated')
+  }
+
+  try {
+    const idea = await prisma.idea.update({
+      where: {
+        id: ideaId,
+        authorId: session.user.id // Ensure user owns the idea
+      },
+      data: {
+        title,
+        description,
+        tags: {
+          deleteMany: {},  // Remove existing tags
+          create: tags.map(tagId => ({
+            tag: {
+              connect: { id: tagId }
+            }
+          }))
+        }
+      }
+    });
+
+    revalidatePath(`/ideas/${ideaId}`);
+    return idea;
+  } catch (error) {
+    console.error('Error updating idea:', error);
+    throw error;
+  }
+}
+
+export async function deleteIdea(ideaId: string) {
+  const session = await auth()
+  if (!session?.user) {
+    throw new Error('Not authenticated')
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true }
+  })
+
+  try {
+    // If user is admin, delete any idea. If not, only delete own ideas
+    if (user?.role === UserRole.ADMIN) {
+      await prisma.idea.delete({
+        where: { id: ideaId }
+      })
+    } else {
+      await prisma.idea.delete({
+        where: {
+          id: ideaId,
+          authorId: session.user.id
+        }
+      })
+    }
+
+    revalidatePath('/ideas')
+    return true
+  } catch (error) {
+    console.error('Error deleting idea:', error)
+    throw error
   }
 }

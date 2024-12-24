@@ -5,18 +5,40 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { handleLike, handleShare } from "@/lib/idea.utils"
 import { useState } from "react"
-import toast from "react-hot-toast"
-import { LikeButton, ShareButton } from "./idea_buttons"
-import { DetailedIdeaResponse } from "@/lib/actions/ideas.actions"
+import { LikeButton, ShareButton, EditButton, DeleteButton } from "./idea_buttons"
+import { DetailedIdeaResponse, deleteIdea } from "@/lib/actions/ideas.actions"
 import { cn, formatDate } from "@/lib/utils"
 import { statusConfig } from "@/types/status_ideas"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import toast from "react-hot-toast"
 
 type IdeaDetailsProps = Omit<DetailedIdeaResponse, 'comments'>
 
 export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
+  const session = useSession()
+  const router = useRouter()
+  const [isDeleting, setIsDeleting] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [liked, setLiked] = useState(idea.hasLiked)
   const [likeCount, setLikeCount] = useState(idea._count.likes)
+
+  const canModify =
+    session.data?.user.id === idea.authorId ||
+    session.data?.user.role === 'ADMIN'
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    try {
+      await deleteIdea(idea.id)
+      toast.success('Idea deleted successfully')
+      router.push('/ideas')
+    } catch (error) {
+      toast.error('Failed to delete idea')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   const onLike = async () => {
     if (isLoading) return
@@ -81,16 +103,19 @@ export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
               </Badge>
             ))}
           </div>
-          <div className="flex justify-between w-full">
+          <div className="flex justify-between items-baseline w-full">
             <LikeButton
               onClick={onLike}
               liked={liked}
               numberLikes={likeCount}
             />
-            <span className="text-sm text-muted-foreground">
-              {idea._count.comments} comments
-            </span>
             <ShareButton onClick={onShare} />
+            {canModify && (
+              <>
+                <EditButton ideaId={idea.id} />
+                <DeleteButton onDelete={handleDelete} isDeleting={isDeleting} />
+              </>
+            )}
           </div>
         </CardFooter>
       </Card>
