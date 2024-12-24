@@ -6,6 +6,14 @@ import Link from "next/link"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
+import toast from "react-hot-toast"
+import { toggleLike } from "@/lib/actions/ideas.actions"
+import { useOptimistic, useState, useTransition } from "react"
+import { set } from "react-hook-form"
+
+type OptimisticAction = {
+  type: 'like' | 'unlike'
+}
 
 
 
@@ -25,25 +33,65 @@ const statusConfig: Record<IdeaStatus, { label: string, className: string }> = {
 }
 
 
-export function IdeaCard({ idea: {
-  id,
-  title,
-  description,
-  author,
-  hasLiked,
-  status,
-  tags,
-  _count,
-  createdAt,
-  mentorValidated
-} }: { idea: IdeaCard }) {
+export default function IdeaCard({ idea }: { idea: IdeaCard }) {
+  const {
+    id,
+    title,
+    description,
+    author,
+    hasLiked,
+    status,
+    tags,
+    _count,
+    createdAt,
+    mentorValidated
+  } = idea
   const formattedDate = new Date(createdAt).toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
     minute: '2-digit'
   });
-  console.log('tags', tags)
+
+  const [liked, setLiked] = useState(hasLiked)
+  const [numberLikes, setNumberLikes] = useState(_count.likes)
+
+  const handleLike = async () => {
+    try {
+      setLiked((prev) => !prev)
+      setNumberLikes(prev => liked ? prev - 1 : prev + 1)
+      await toggleLike(id)
+    } catch (error) {
+      toast.error("Error while liking idea")
+      setLiked((prev) => !prev)
+      setNumberLikes((prev) => prev - 1)
+    }
+
+  }
+
+
+
+  const handleShare = async () => {
+    if (!navigator.share) {
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success('Link copied to clipboard!')
+      return
+    }
+
+    try {
+      await navigator.share({
+        title: title,
+        text: description,
+        url: window.location.href
+      })
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        toast.error('Failed to share')
+      }
+    }
+  }
+
+
   return (
     <Card className="w-full max-w-xl overflow-hidden hover:bg-primary-foreground/90 hover:shadow-card hover:cursor-pointer">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -95,11 +143,11 @@ export function IdeaCard({ idea: {
           className="flex items-center space-x-1/5"
           onClick={(e) => {
             e.stopPropagation();
-            // TODO: Implement like functionality
+            handleLike()
           }}
         >
-          <Heart className={cn("h-4 w-4", hasLiked && "text-red-500 fill-red-500 ")} />
-          <span className="text-sm">{_count.likes}</span>
+          <Heart className={cn("h-4 w-4", liked && "text-red-500 fill-red-500 ")} />
+          <span className="text-sm">{numberLikes}</span>
         </Button>
         <Button
           variant="ghost"
@@ -119,7 +167,7 @@ export function IdeaCard({ idea: {
           className="flex items-center"
           onClick={(e) => {
             e.stopPropagation();
-            // TODO: Implement share functionality
+            handleShare()
           }}
         >
           <Share2 className="h-4 w-4" />

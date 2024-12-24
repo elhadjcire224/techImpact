@@ -179,3 +179,45 @@ export async function createIdea({
     throw error;
   }
 }
+
+export async function toggleLike(ideaId: string) {
+  const session = await auth()
+  if (!session?.user) {
+    throw new Error('Not authenticated')
+  }
+
+  try {
+    const existingLike = await prisma.ideaLike.findUnique({
+      where: {
+        userId_ideaId: {
+          userId: session.user.id,
+          ideaId: ideaId,
+        },
+      },
+    })
+
+    if (existingLike) {
+      await prisma.ideaLike.delete({
+        where: {
+          userId_ideaId: {
+            userId: session.user.id,
+            ideaId: ideaId,
+          },
+        },
+      })
+      return { action: 'unliked' }
+    } else {
+      // Sinon on crée un nouveau like
+      await prisma.ideaLike.create({
+        data: {
+          userId: session.user.id,
+          ideaId: ideaId,
+        },
+      })
+      return { action: 'liked' }
+    }
+  } catch (error) {
+    console.error('Error toggling like:', error)
+    throw error
+  }
+}

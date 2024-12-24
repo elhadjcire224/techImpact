@@ -1,6 +1,6 @@
 'use client'
 
-import { IdeaCard } from "@/components/ideas/ideas_card"
+import IdeaCard from "@/components/ideas/ideas_card"
 import { IdeaFilters } from "@/components/ideas/ideas_filters"
 import { Button } from "@/components/ui/button"
 import { useIdeasInfiniteScroll } from "@/hooks/use_infinite_ideas"
