@@ -1,36 +1,17 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { type IdeaCard, IdeaStatus } from "@/types/ideas_types"
-import { Heart, MessageCircle, Share2 } from "lucide-react"
+import { MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
 import toast from "react-hot-toast"
-import { toggleLike } from "@/lib/actions/ideas.actions"
-import { useOptimistic, useState, useTransition } from "react"
-import { set } from "react-hook-form"
-
-type OptimisticAction = {
-  type: 'like' | 'unlike'
-}
-
-
-
-const statusConfig: Record<IdeaStatus, { label: string, className: string }> = {
-  [IdeaStatus.InDiscussion]: {
-    label: IdeaStatus.InDiscussion,
-    className: 'bg-blue-500/10 text-blue-500'
-  },
-  [IdeaStatus.InProgress]: {
-    label: IdeaStatus.InProgress,
-    className: 'bg-violet-500/10 text-violet-500'
-  },
-  [IdeaStatus.Completed]: {
-    label: IdeaStatus.Completed,
-    className: 'bg-green-500/10 text-green-500'
-  }
-}
+import { toggleLike, addComment } from "@/lib/actions/ideas.actions"
+import { useState } from "react"
+import { LikeButton, ShareButton } from "./idea_buttons"
+import { CommentModal } from "./comment_modal"
+import { statusConfig } from "@/types/status_ideas"
 
 
 export default function IdeaCard({ idea }: { idea: IdeaCard }) {
@@ -55,6 +36,7 @@ export default function IdeaCard({ idea }: { idea: IdeaCard }) {
 
   const [liked, setLiked] = useState(hasLiked)
   const [numberLikes, setNumberLikes] = useState(_count.likes)
+  const [comments, setComments] = useState(_count.comments)
 
   const handleLike = async () => {
     try {
@@ -66,23 +48,21 @@ export default function IdeaCard({ idea }: { idea: IdeaCard }) {
       setLiked((prev) => !prev)
       setNumberLikes((prev) => prev - 1)
     }
-
   }
 
-
-
   const handleShare = async () => {
+    const url = `${window.location.href}/${id}`
     if (!navigator.share) {
-      await navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(url)
       toast.success('Link copied to clipboard!')
       return
     }
 
     try {
       await navigator.share({
-        title: title,
-        text: description,
-        url: window.location.href
+        title,
+        url,
+        text: description
       })
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') {
@@ -91,6 +71,15 @@ export default function IdeaCard({ idea }: { idea: IdeaCard }) {
     }
   }
 
+  const onCommentSubmit = async (commentText: string) => {
+    try {
+      await addComment(id, commentText)
+      setComments(prev => prev + 1)
+      toast.success("Comment added successfully")
+    } catch (error) {
+      toast.error("Error while adding comment")
+    }
+  }
 
   return (
     <Card className="w-full max-w-xl overflow-hidden hover:bg-primary-foreground/90 hover:shadow-card hover:cursor-pointer">
@@ -137,41 +126,13 @@ export default function IdeaCard({ idea }: { idea: IdeaCard }) {
       </Link>
 
       <CardFooter className="flex justify-start space-x-2 text-muted-foreground">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center space-x-1/5"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleLike()
-          }}
-        >
-          <Heart className={cn("h-4 w-4", liked && "text-red-500 fill-red-500 ")} />
-          <span className="text-sm">{numberLikes}</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center space-x-1/5"
-          onClick={(e) => {
-            e.stopPropagation();
-            // TODO: Navigate to comments
-          }}
-        >
+        <LikeButton liked={liked} numberLikes={numberLikes} onClick={handleLike} />
+        <CommentModal onCommentSubmit={onCommentSubmit}>
+
           <MessageCircle className="h-4 w-4" />
-          <span className="text-sm">{_count.comments}</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleShare()
-          }}
-        >
-          <Share2 className="h-4 w-4" />
-        </Button>
+        </CommentModal>
+        <span className="text-sm">{comments}</span>
+        <ShareButton onClick={handleShare} />
       </CardFooter>
     </Card>
   )
