@@ -35,7 +35,6 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
     async session({ session, token, user }) {
       if (session.user) {
         session.user.id = user.id as string;
-        session.user.onboardingCompleted = token.onboardingCompleted as boolean;
       }
       return session;
     }
