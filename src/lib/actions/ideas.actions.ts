@@ -1,14 +1,15 @@
+// app/actions/idea.actions.ts
 "use server"
 
 import { auth } from "@/app/auth";
-import prisma from "@/db/prisma";
-import { IdeaStatus } from "@/types/ideas_types";
+import prisma from "@/db/prisma"
+import { IdeaStatus } from "@/types/ideas_types"
 import { revalidatePath } from "next/cache";
 
 interface FetchIdeasParams {
   page: number;
   searchQuery: string;
-  selectedTags: string[];
+  selectedTags: string[];  // Maintenant ce sont les IDs des tags
   sortBy: 'recent' | 'discussed' | 'liked';
   filterBy: 'all' | 'myideas';
   userId?: string;
@@ -20,31 +21,57 @@ export async function fetchIdeas({
   selectedTags = [],
   sortBy = 'recent',
   filterBy = 'all',
-  userId
+
 }: FetchIdeasParams) {
-  const ITEMS_PER_PAGE = 15;
+  const ITEMS_PER_PAGE = 10;
   const skip = (page - 1) * ITEMS_PER_PAGE;
+  const userId = (await auth())?.user.id
 
   try {
     const ideas = await prisma.idea.findMany({
       where: {
         AND: [
           { title: { contains: searchQuery, mode: 'insensitive' } },
-          selectedTags.length > 0 ? { tags: { hasSome: selectedTags } } : {},
+          selectedTags.length > 0
+            ? {
+              tags: {
+                some: {
+                  id: { in: selectedTags }
+                }
+              }
+            }
+            : {},
           filterBy === 'myideas' && userId ? { authorId: userId } : {},
         ],
       },
       include: {
         author: {
           select: {
+            id: true,
             name: true,
             image: true,
+          }
+        },
+        tags: {
+          select: {
             id: true,
+            label: true
           }
         },
         _count: {
-          select: { comments: true, likes: true }
-        }
+          select: {
+            comments: true,
+            likes: true
+          }
+        },
+        likes: userId ? {
+          where: {
+            userId: userId
+          },
+          select: {
+            userId: true
+          }
+        } : false
       },
       orderBy: {
         ...(sortBy === 'recent' ? { createdAt: 'desc' } : {}),
@@ -59,16 +86,32 @@ export async function fetchIdeas({
       where: {
         AND: [
           { title: { contains: searchQuery, mode: 'insensitive' } },
-          selectedTags.length > 0 ? { tags: { hasSome: selectedTags } } : {},
+          selectedTags.length > 0
+            ? {
+              tags: {
+                some: {
+                  id: { in: selectedTags }
+                }
+              }
+            }
+            : {},
           filterBy === 'myideas' && userId ? { authorId: userId } : {},
         ],
       },
     });
 
+    // Transformer les données pour le front
+    const transformedIdeas = ideas.map(idea => ({
+      ...idea,
+      hasLiked: idea.likes ? idea.likes.length > 0 : false,
+      likes: undefined // On ne renvoie pas la liste des likes
+    }));
+
     const hasMore = skip + ideas.length < totalIdeas;
+    // console.log(ideas[0].tags)
 
     return {
-      ideas,
+      ideas: transformedIdeas,
       hasMore,
       totalIdeas
     };
@@ -104,24 +147,18 @@ export async function createIdea({
 
   const session = await auth()
   console.log('session server', session)
+
   if (!session) return
   try {
     const idea = await prisma.idea.create({
       data: {
         title,
         description,
-        tags,
+        tags: {
+          connect: tags.map(tag => ({ id: tag }))
+        },
         authorId: session.user.id,
         status: IdeaStatus.InDiscussion
-      },
-      include: {
-        author: {
-          select: {
-            name: true,
-            image: true,
-            id: true
-          }
-        }
       }
     });
 

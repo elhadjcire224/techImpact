@@ -102,7 +102,7 @@ model Idea {
   description     String   @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  tags            String[]
+  tags            Tag[]
   status          String
   mentorValidated Boolean  @default(false)
 
@@ -118,6 +118,8 @@ model Idea {
 model Tag {
   id    String @id @default(cuid())
   label String @unique
+
+  ideas Idea[]
 
   @@map("idea_tags")
 }

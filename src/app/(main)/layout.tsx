@@ -1,14 +1,7 @@
-// app/(main)/layout.tsx
 import { PageBreadcrumb } from "@/components/header_breadcrumb"
 import { Header } from "@/components/headers/header"
 import { AppSidebar } from "@/components/sidebar"
 import { ModeToggle } from "@/components/toggle_theme_button"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,

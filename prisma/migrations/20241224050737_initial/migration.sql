@@ -72,7 +72,6 @@ CREATE TABLE "ideas" (
     "description" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "tags" TEXT[],
     "status" TEXT NOT NULL,
     "mentorValidated" BOOLEAN NOT NULL DEFAULT false,
     "authorId" TEXT NOT NULL,
@@ -120,6 +119,14 @@ CREATE TABLE "mentor_requests" (
     CONSTRAINT "mentor_requests_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "_IdeaToTag" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_IdeaToTag_AB_pkey" PRIMARY KEY ("A","B")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "accounts_provider_provider_account_id_key" ON "accounts"("provider", "provider_account_id");
 
@@ -137,6 +144,9 @@ CREATE UNIQUE INDEX "idea_tags_label_key" ON "idea_tags"("label");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "mentor_requests_userId_key" ON "mentor_requests"("userId");
+
+-- CreateIndex
+CREATE INDEX "_IdeaToTag_B_index" ON "_IdeaToTag"("B");
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -164,3 +174,9 @@ ALTER TABLE "idea_likes" ADD CONSTRAINT "idea_likes_ideaId_fkey" FOREIGN KEY ("i
 
 -- AddForeignKey
 ALTER TABLE "mentor_requests" ADD CONSTRAINT "mentor_requests_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_IdeaToTag" ADD CONSTRAINT "_IdeaToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "ideas"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_IdeaToTag" ADD CONSTRAINT "_IdeaToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "idea_tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;

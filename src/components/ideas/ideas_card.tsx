@@ -43,7 +43,7 @@ export function IdeaCard({ idea: {
     hour: '2-digit',
     minute: '2-digit'
   });
-
+  console.log('tags', tags)
   return (
     <Card className="w-full max-w-xl overflow-hidden hover:bg-primary-foreground/90 hover:shadow-card hover:cursor-pointer">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -79,8 +79,8 @@ export function IdeaCard({ idea: {
           </div>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="bg-sky-500/5 text-sky-500">
-                {tag}
+              <Badge key={tag.id} variant="outline" className="bg-sky-500/5 text-sky-500">
+                {tag.label}
               </Badge>
             ))}
           </div>

@@ -1,11 +1,8 @@
 import { fetchIdeas } from "@/lib/actions/ideas.actions";
 import { IdeaCard } from "@/types/ideas_types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 import { Tag } from "./use_tags";
-
-
-
 
 export function useIdeasInfiniteScroll(
   searchQuery: string,
@@ -18,7 +15,9 @@ export function useIdeasInfiniteScroll(
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const { ref, inView } = useInView();
-  const selectedTagsIds = selectedTags.map(tag => tag.id);
+
+  const selectedTagsIds = useMemo(() => selectedTags.map(tag => tag.id), [selectedTags]);
+
   const resetAndLoad = useCallback(async () => {
     setIsLoading(true);
     setPage(1);
@@ -30,17 +29,17 @@ export function useIdeasInfiniteScroll(
         sortBy,
         filterBy,
       });
-
+      setIdeas(result.ideas as IdeaCard[]);
       setHasMore(result.hasMore);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching ideas:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedTags, sortBy, filterBy]);
+  }, [searchQuery, selectedTagsIds, sortBy, filterBy]);
 
   const loadMore = useCallback(async () => {
-    if (isLoading || !hasMore) return;
+    if (isLoading || !hasMore || page === 0) return;
 
     setIsLoading(true);
     try {
@@ -55,11 +54,11 @@ export function useIdeasInfiniteScroll(
       setHasMore(result.hasMore);
       setPage(prev => prev + 1);
     } catch (error) {
-      console.error(error);
+      console.error("Error loading more ideas:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [page, hasMore, isLoading, searchQuery, selectedTags, sortBy, filterBy]);
+  }, [page, hasMore, isLoading, searchQuery, selectedTagsIds, sortBy, filterBy]);
 
   useEffect(() => {
     resetAndLoad();
@@ -75,6 +74,6 @@ export function useIdeasInfiniteScroll(
     ideas,
     isLoading,
     hasMore,
-    loadMoreRef: ref
+    loadMoreRef: ref,
   };
 }

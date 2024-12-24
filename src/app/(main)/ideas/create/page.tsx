@@ -36,7 +36,8 @@ export default function CreateIdeasPage() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log('session client', session)
+        console.log('session client', values.tags)
+
         try {
             await createIdea({ ...values, authorId: session.data?.user.id! })
             toast.success("Idea created successfully!")

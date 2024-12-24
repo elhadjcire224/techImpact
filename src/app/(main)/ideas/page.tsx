@@ -40,7 +40,7 @@ export default function IdeasPage() {
       />
       <div className=" grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {ideas.map((idea) => (
-          <IdeaCard idea={idea} />
+          <IdeaCard key={idea.id} idea={idea} />
         ))}
       </div>
 

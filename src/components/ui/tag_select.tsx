@@ -50,6 +50,7 @@ export function TagSelect({ selected, options, onChange, showLabels = true }: Ta
           {options.map((tag) => (
             <MultiSelectorItem
               key={tag.id}
+
               value={showLabels ? tag.label : tag.id}
             >
               {tag.label}
