@@ -222,22 +222,27 @@ export async function toggleLike(ideaId: string) {
   }
 }
 
-export async function addComment(ideaId: string, commentText: string): Promise<void> {
+export async function addComment(ideaId: string, commentText: string): Promise<{ id: string, createdAt: Date }> {
   const session = await auth()
   if (!session?.user) {
     throw new Error('Not authenticated')
   }
 
   try {
-    await prisma.comment.create({
+    const data = await prisma.comment.create({
       data: {
         content: commentText,
         ideaId: ideaId,
         authorId: session.user.id,
       },
+      select: {
+        id: true,
+        createdAt: true
+      }
     });
 
     revalidatePath(`/ideas/${ideaId}`);
+    return data
   } catch (error) {
     console.error('Error adding comment:', error);
     throw error;

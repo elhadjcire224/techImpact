@@ -3,11 +3,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { addComment, DetailedIdeaResponse } from "@/lib/actions/ideas.actions"
+import { DetailedIdeaResponse } from "@/lib/actions/ideas.actions"
 import { useState } from "react"
-import toast from "react-hot-toast"
 import { CommentModal } from "./comment_modal"
 import Link from "next/link"
+import { handleCommentSubmit } from "@/lib/idea.utils"
+import { useSession } from "next-auth/react"
+import { formatDate } from "@/lib/utils"
 
 type Comment = DetailedIdeaResponse['comments'][number]
 
@@ -17,41 +19,48 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ comments, ideaId }: CommentSectionProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [commentsList, setCommentsList] = useState(comments)
+  const session = useSession()
 
-  const handleCommentSubmit = async (content: string) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      await addComment(ideaId, content);
-      setIsOpen(false);
-      toast.success('Comment added successfully');
-    } catch (error) {
-      toast.error('Failed to add comment');
-    } finally {
-      setIsSubmitting(false);
+  const onCommentSubmit = async (content: string) => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
+    const result = await handleCommentSubmit(ideaId, content)
+    if (result) {
+      // Optimistic update - you might want to refresh the comments instead
+      setCommentsList(prev => [{
+        id: result.id,
+        content,
+        createdAt: result.createdAt,
+        author: {
+          id: session.data?.user.id!,
+          name: session.data?.user.name!,
+          image: session.data?.user.image!
+        }
+      }, ...prev])
     }
-  };
+    setIsSubmitting(false)
+  }
 
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Comments</h2>
-        <CommentModal onCommentSubmit={handleCommentSubmit}>
+        <CommentModal onCommentSubmit={onCommentSubmit}>
           <Button>Add Comment</Button>
         </CommentModal>
       </div>
 
       <div className="space-y-4">
-        {comments.length === 0 ? (
+        {commentsList.length === 0 ? (
           <Card>
             <CardContent className="text-center py-8 text-muted-foreground">
               No comments yet. Be the first to share your thoughts!
             </CardContent>
           </Card>
         ) : (
-          comments.map((comment) => (
+          commentsList.map((comment) => (
             <Card key={comment.id}>
               <CardHeader className="flex flex-row items-center space-y-0">
                 <Avatar className="h-8 w-8 mr-2">
@@ -61,7 +70,7 @@ export function CommentSection({ comments, ideaId }: CommentSectionProps) {
                 <div className="flex flex-col">
                   <Link href={`members/${comment.author.id}`}><p className="font-medium">{comment.author.name}</p></Link>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(comment.createdAt).toLocaleDateString()}
+                    {formatDate(comment.createdAt)}
                   </p>
                 </div>
               </CardHeader>

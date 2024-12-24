@@ -1,10 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { cn } from "@/lib/utils"
+import { cn, formatDate } from "@/lib/utils"
 import { type IdeaCard, IdeaStatus } from "@/types/ideas_types"
 import { MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "../ui/badge"
-import { Button } from "../ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
 import toast from "react-hot-toast"
 import { toggleLike, addComment } from "@/lib/actions/ideas.actions"
@@ -27,12 +26,7 @@ export default function IdeaCard({ idea }: { idea: IdeaCard }) {
     createdAt,
     mentorValidated
   } = idea
-  const formattedDate = new Date(createdAt).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  const formattedDate = formatDate(createdAt);
 
   const [liked, setLiked] = useState(hasLiked)
   const [numberLikes, setNumberLikes] = useState(_count.likes)
@@ -137,3 +131,4 @@ export default function IdeaCard({ idea }: { idea: IdeaCard }) {
     </Card>
   )
 }
+

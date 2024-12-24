@@ -3,54 +3,43 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { toggleLike } from "@/lib/actions/ideas.actions"
+import { handleLike, handleShare } from "@/lib/idea.utils"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import { LikeButton, ShareButton } from "./idea_buttons"
 import { DetailedIdeaResponse } from "@/lib/actions/ideas.actions"
-import { cn } from "@/lib/utils"
+import { cn, formatDate } from "@/lib/utils"
 import { statusConfig } from "@/types/status_ideas"
 
 type IdeaDetailsProps = Omit<DetailedIdeaResponse, 'comments'>
 
 export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
   const [isLoading, setIsLoading] = useState(false)
+  const [liked, setLiked] = useState(idea.hasLiked)
+  const [likeCount, setLikeCount] = useState(idea._count.likes)
 
-  const handleLike = async () => {
+  const onLike = async () => {
     if (isLoading) return
     setIsLoading(true)
-    try {
-      await toggleLike(idea.id)
-    } catch (error) {
-      toast.error("Failed to update like")
-    } finally {
-      setIsLoading(false)
+    setLiked(prev => !prev)
+    setLikeCount(prev => liked ? prev - 1 : prev + 1)
+
+    const success = await handleLike(idea.id)
+    if (!success) {
+      setLiked(prev => !prev)
+      setLikeCount(prev => liked ? prev + 1 : prev - 1)
     }
+    setIsLoading(false)
   }
 
-  const handleShare = async () => {
-    if (!navigator.share) {
-      await navigator.clipboard.writeText(window.location.href)
-      toast.success('Link copied to clipboard!')
-      return
-    }
-
-    try {
-      await navigator.share({
-        title: idea.title,
-        text: idea.description,
-        url: window.location.href
-      })
-    } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
-        toast.error('Failed to share')
-      }
-    }
-  }
+  const onShare = () => handleShare(
+    idea.title,
+    idea.description,
+    window.location.href
+  )
 
   return (
     <div className="space-y-4">
-      {/* Header avec Author + Status */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Avatar className="h-10 w-10">
@@ -60,7 +49,7 @@ export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
           <div>
             <p className="font-medium">{idea.author.name}</p>
             <p className="text-sm text-muted-foreground">
-              {new Date(idea.createdAt).toLocaleDateString()}
+              {formatDate(idea.createdAt)}
             </p>
           </div>
         </div>
@@ -94,14 +83,14 @@ export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
           </div>
           <div className="flex justify-between w-full">
             <LikeButton
-              onClick={handleLike}
-              liked={idea.hasLiked}
-              numberLikes={idea._count.likes}
+              onClick={onLike}
+              liked={liked}
+              numberLikes={likeCount}
             />
             <span className="text-sm text-muted-foreground">
               {idea._count.comments} comments
             </span>
-            <ShareButton onClick={handleShare} />
+            <ShareButton onClick={onShare} />
           </div>
         </CardFooter>
       </Card>
