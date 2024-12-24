@@ -433,3 +433,33 @@ export async function deleteIdea(ideaId: string) {
     throw error
   }
 }
+
+export async function deleteComment(commentId: string) {
+  const session = await auth()
+  if (!session?.user) {
+    throw new Error('Not authenticated')
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true }
+  })
+
+  try {
+    // Allow deletion if user is comment author or admin
+    if (user?.role === UserRole.ADMIN) {
+      await prisma.comment.delete({ where: { id: commentId } })
+    } else {
+      await prisma.comment.delete({
+        where: {
+          id: commentId,
+          authorId: session.user.id
+        }
+      })
+    }
+    return true
+  } catch (error) {
+    console.error('Error deleting comment:', error)
+    throw error
+  }
+}

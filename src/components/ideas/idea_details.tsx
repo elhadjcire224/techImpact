@@ -10,14 +10,14 @@ import { DetailedIdeaResponse, deleteIdea } from "@/lib/actions/ideas.actions"
 import { cn, formatDate } from "@/lib/utils"
 import { statusConfig } from "@/types/status_ideas"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import toast from "react-hot-toast"
+import { UserRole } from "@/types/user_roles"
 
 type IdeaDetailsProps = Omit<DetailedIdeaResponse, 'comments'>
 
 export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
   const session = useSession()
-  const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [liked, setLiked] = useState(idea.hasLiked)
@@ -25,14 +25,14 @@ export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
 
   const canModify =
     session.data?.user.id === idea.authorId ||
-    session.data?.user.role === 'ADMIN'
+    session.data?.user.role === UserRole.ADMIN
 
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
       await deleteIdea(idea.id)
       toast.success('Idea deleted successfully')
-      router.push('/ideas')
+      return redirect('/ideas')
     } catch (error) {
       toast.error('Failed to delete idea')
     } finally {
@@ -61,7 +61,7 @@ export default function IdeaDetails({ idea }: { idea: IdeaDetailsProps }) {
   )
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-hidden">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Avatar className="h-10 w-10">
