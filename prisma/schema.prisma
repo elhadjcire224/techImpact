@@ -60,7 +60,7 @@ enum Role {
 
 model User {
   id                  String      @id @default(cuid())
-  email               String
+  email               String      @unique
   name                String?
   image               String?
   phone               String?
@@ -72,6 +72,7 @@ model User {
   role                Role        @default(USER)
   updatedAt           DateTime    @updatedAt
   createdAt           DateTime    @default(now())
+  emailVerified       DateTime?
   skills              UserSkill[]
 
   // Relations
@@ -114,11 +115,10 @@ model Idea {
   @@map("ideas")
 }
 
-model IdeaTag {
-  ideaId String
-  tag    String
+model Tag {
+  id    String @id @default(cuid())
+  label String @unique
 
-  @@id([ideaId, tag])
   @@map("idea_tags")
 }
 

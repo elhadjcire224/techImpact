@@ -50,8 +50,8 @@ CREATE TABLE "users" (
     "onboardingCompleted" BOOLEAN NOT NULL DEFAULT false,
     "role" "Role" NOT NULL DEFAULT 'USER',
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "emailVerified" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "emailVerified" TIMESTAMP(3),
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -73,11 +73,19 @@ CREATE TABLE "ideas" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "tags" TEXT[],
-    "status" TEXT NOT NULL DEFAULT 'En discussion',
+    "status" TEXT NOT NULL,
     "mentorValidated" BOOLEAN NOT NULL DEFAULT false,
     "authorId" TEXT NOT NULL,
 
     CONSTRAINT "ideas_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "idea_tags" (
+    "id" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+
+    CONSTRAINT "idea_tags_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -125,6 +133,9 @@ CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "idea_tags_label_key" ON "idea_tags"("label");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "mentor_requests_userId_key" ON "mentor_requests"("userId");
 
 -- AddForeignKey
@@ -134,7 +145,7 @@ ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_skills" ADD CONSTRAINT "user_skills_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_skills" ADD CONSTRAINT "user_skills_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ideas" ADD CONSTRAINT "ideas_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
