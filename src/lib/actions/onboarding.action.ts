@@ -7,7 +7,7 @@ import { put } from "@vercel/blob";
 
 export async function completeOnboarding(
 	values: onBoardingShemaType,
-	avatar: File | null,
+	avatar: File,
 	cv?: File,
 ) {
 	const session = await auth();
@@ -58,18 +58,6 @@ export async function completeOnboarding(
       skills: true
     }
 	});
-
-
-
-
-	// for (const skill of values.skills || []) {
-	//   await prisma.userSkill.create({
-	//     data: {
-	//       userId: session.user.id,
-	//       skill,
-	//     },
-	//   });
-	// }
 
 	return { success: true, message: "Profile completed successfully" };
 }
