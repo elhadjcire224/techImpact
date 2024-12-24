@@ -1,6 +1,8 @@
 "use server"
 
 import prisma from "@/db/prisma";
+import { IdeaStatus } from "@/types/ideas_types";
+import { revalidatePath } from "next/cache";
 
 interface FetchIdeasParams {
   page: number;
@@ -71,6 +73,58 @@ export async function fetchIdeas({
     };
   } catch (error) {
     console.error('Error fetching ideas:', error);
+    throw error;
+  }
+}
+
+type CreateIdeaResult = {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  createdAt: Date;
+  author: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+}
+
+export async function createIdea({
+  title,
+  description,
+  tags,
+  authorId
+}: {
+  title: string;
+  description: string;
+  tags: string[];
+  authorId: string;
+}): Promise<CreateIdeaResult> {
+  try {
+    const idea = await prisma.idea.create({
+      data: {
+        title,
+        description,
+        tags,
+        authorId,
+        status: IdeaStatus.InDiscussion
+      },
+      include: {
+        author: {
+          select: {
+            name: true,
+            image: true,
+            id: true
+          }
+        }
+      }
+    });
+
+    revalidatePath('/ideas');
+    return idea;
+  } catch (error) {
+    console.error('Error creating idea:', error);
     throw error;
   }
 }
