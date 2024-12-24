@@ -1,19 +1,44 @@
 
-import { Tag } from "@/hooks/use_tags"
-import { MultiSelector, MultiSelectorContent, MultiSelectorInput, MultiSelectorItem, MultiSelectorList, MultiSelectorTrigger } from "./multi_select"
+import {
+  MultiSelector,
+  MultiSelectorTrigger,
+  MultiSelectorInput,
+  MultiSelectorContent,
+  MultiSelectorList,
+  MultiSelectorItem
+} from "./multi_select";
 
-
-interface TagSelectProps {
-  selected: string[]
-  options: Tag[]
-  onChange: (value: string[]) => void
+interface Tag {
+  id: string;
+  label: string;
 }
 
-export function TagSelect({ selected, options, onChange }: TagSelectProps) {
+interface TagSelectProps {
+  selected: string[];
+  options: Tag[];
+  onChange: (value: string[]) => void;
+  showLabels?: boolean;
+}
+
+export function TagSelect({ selected, options, onChange, showLabels = true }: TagSelectProps) {
+  const getLabel = (id: string) => {
+    return options.find(tag => tag.id === id)?.label || id;
+  };
+
   return (
     <MultiSelector
-      values={selected}
-      onValuesChange={onChange}
+      values={showLabels ? selected.map(getLabel) : selected}
+      onValuesChange={(newValues) => {
+        // Convertir les labels en IDs pour la BD
+        const newIds = newValues.map(value => {
+          if (showLabels) {
+            const tag = options.find(t => t.label === value);
+            return tag?.id || value;
+          }
+          return value;
+        });
+        onChange(newIds);
+      }}
       loop
       className="w-full"
     >
@@ -23,12 +48,15 @@ export function TagSelect({ selected, options, onChange }: TagSelectProps) {
       <MultiSelectorContent>
         <MultiSelectorList>
           {options.map((tag) => (
-            <MultiSelectorItem key={tag.id} value={tag.id}>
+            <MultiSelectorItem
+              key={tag.id}
+              value={showLabels ? tag.label : tag.id}
+            >
               {tag.label}
             </MultiSelectorItem>
           ))}
         </MultiSelectorList>
       </MultiSelectorContent>
     </MultiSelector>
-  )
+  );
 }

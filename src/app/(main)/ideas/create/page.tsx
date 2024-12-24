@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
 import { TagSelect } from "@/components/ui/tag_select"
 import { useSession } from "next-auth/react"
+import { ArrowLeft, Sparkles } from "lucide-react"
 
 const formSchema = z.object({
     title: z.string().min(10, "Title must be at least 10 characters"),
@@ -35,8 +36,12 @@ export default function CreateIdeasPage() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (!session.data?.user?.id) {
+            toast.error("You must be logged in to create an idea")
+            return
+        }
         try {
-            await createIdea({ authorId: session.data?.user.id!, ...values })
+            await createIdea({ ...values, authorId: session.data?.user.id! })
             toast.success("Idea created successfully!")
             router.push("/ideas")
         } catch (error) {
@@ -45,80 +50,107 @@ export default function CreateIdeasPage() {
     }
 
     return (
-        <div className="container max-w-4xl py-10">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-3xl font-bold">Create New Idea</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                            <FormField
-                                control={form.control}
-                                name="title"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Title</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Enter idea title" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+        <div className="min-h-screen bg-gradient-to-b from-background to-background/80 py-8">
+            <div className="container max-w-4xl mx-auto">
+                <Button
+                    variant="ghost"
+                    className="mb-6 mt-4 text-muted-foreground hover:text-foreground"
+                    onClick={() => router.back()}
+                >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back
+                </Button>
 
-                            <FormField
-                                control={form.control}
-                                name="description"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Description</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                placeholder="Describe your idea in detail"
-                                                className="min-h-[200px]"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="tags"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Tags</FormLabel>
-                                        <FormControl>
-                                            <TagSelect
-                                                selected={field.value}
-                                                options={availableTags}
-                                                onChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                <Card className="border-none shadow-lg bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <CardHeader className="space-y-4 pb-6">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="h-6 w-6 text-primary" />
+                            <h1 className="text-2xl font-bold tracking-tight">Create New Idea</h1>
+                        </div>
+                        <p className="text-muted-foreground text-sm">
+                            Share your innovative idea with the community. Be specific and provide enough details for others to understand and contribute.
+                        </p>
+                    </CardHeader>
+                    <CardContent>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                                <FormField
+                                    control={form.control}
+                                    name="title"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">Title</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Enter a clear, descriptive title"
+                                                    className="bg-background/50"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Describe your idea in detail. What problem does it solve? How can others help?"
+                                                    className="min-h-[200px] bg-background/50 resize-none"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            <div className="flex justify-end gap-4">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => router.back()}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type="submit" disabled={form.formState.isSubmitting}>
-                                    {form.formState.isSubmitting ? "Creating..." : "Create Idea"}
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
+                                <FormField
+                                    control={form.control}
+                                    name="tags"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">Tags</FormLabel>
+                                            <FormControl>
+                                                <TagSelect
+                                                    selected={field.value}
+                                                    options={availableTags}
+                                                    onChange={field.onChange}
+                                                    showLabels
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="flex justify-end gap-4 pt-4">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => router.back()}
+                                        className="hover:bg-background/80"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={form.formState.isSubmitting}
+                                        className="min-w-[100px]"
+                                    >
+                                        {form.formState.isSubmitting ? "Creating..." : "Create Idea"}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     )
 }
