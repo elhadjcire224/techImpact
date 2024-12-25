@@ -18,11 +18,11 @@ import { AvatarUpload } from "../onboarding/avatar_upload"
 import SkillsInput from "../skills_input"
 
 const profileSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  github: z.string().url({ message: "Please enter a valid URL." }),
-  portfolio: z.string().url({ message: "Please enter a valid URL." }),
-  phone: z.string().min(10, { message: "Please enter a valid phone number." }),
-  bio: z.string().min(10, { message: "Bio must be at least 10 characters." }),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }).optional(),
+  github: z.string().url({ message: "Please enter a valid URL." }).optional(),
+  portfolio: z.string().url({ message: "Please enter a valid URL." }).optional(),
+  phone: z.string().min(10, { message: "Please enter a valid phone number." }).optional(),
+  bio: z.string().min(10, { message: "Bio must be at least 10 characters." }).optional(),
   skills: z.array(z.string()).min(1, { message: "Select at least one skill." }),
 })
 
