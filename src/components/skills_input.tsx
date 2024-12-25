@@ -1,5 +1,4 @@
 "use client"
-
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { X } from "lucide-react"
@@ -24,14 +23,9 @@ export default function SkillsInput({ value, onChange, className }: SkillsInputP
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
-
-
     if (newValue.includes(',')) {
-
       const newSkills = newValue.split(',')
-
       newSkills.slice(0, -1).forEach(skill => addSkill(skill))
-
       setInput(newSkills[newSkills.length - 1])
     } else {
       setInput(newValue)
@@ -42,10 +36,17 @@ export default function SkillsInput({ value, onChange, className }: SkillsInputP
     onChange(value.filter(skill => skill !== skillToRemove))
   }
 
+  const handleBlur = () => {
+    if (input.trim()) {
+      addSkill(input)
+      setInput("")
+    }
+  }
+
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-2 p-2 rounded-md border-2  min-h-12 max-h-40",
+        "flex flex-wrap items-center gap-2 p-2 rounded-md border-2 min-h-12 max-h-40",
         className
       )}
     >
@@ -69,7 +70,7 @@ export default function SkillsInput({ value, onChange, className }: SkillsInputP
         ref={inputRef}
         value={input}
         onChange={handleInputChange}
-
+        onBlur={handleBlur}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault()

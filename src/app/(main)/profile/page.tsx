@@ -16,7 +16,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center ">
-      <div className="container max-w-4xl py-8 px-4 sm:px-6 lg:px-8">
+      <div className="container max-w-4xl py-8 my-8 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-sky-400 bg-clip-text text-transparent">
             Edit Profile

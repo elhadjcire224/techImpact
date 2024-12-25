@@ -2,19 +2,19 @@
 
 import { Button } from "@/components/ui/button"
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card"
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -323,7 +323,7 @@ export default function OnboardingForm({ defaultValues }: OnboardingFormProps) {
                         />
                       </FormControl>
                       <FormDescription>
-                        Enter your skills one by one. Press <strong className="text-blue-600">Enter</strong> or <strong className="text-blue-600">comma</strong> to add each skill.
+                        Enter your skills one by one. Press <kbd className="px-2 py-0.5 text-xs rounded-md bg-muted border">Enter</kbd> or <kbd className="px-2 py-0.5 text-xs rounded-md bg-muted border">comma</kbd> to add each skill.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
