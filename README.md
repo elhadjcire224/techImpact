@@ -1,8 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <br />
+  <div>
+    <img src="https://img.shields.io/badge/-Typescript-black?style=for-the-badge&logoColor=white&logo=typescript&color=3178C6" alt="typescript" />
+    <img src="https://img.shields.io/badge/-Next_JS-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=000000" alt="nextdotjs" />
+    <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="tailwindcss" />
+    <img src="https://img.shields.io/badge/-Prisma-black?style=for-the-badge&logoColor=white&logo=prisma&color=2D3748" alt="prisma" />
+  </div>
 
-## Getting Started
+  <h3 align="center">Tech Impact Platform</h3>
+</div>
 
-First, run the development server:
+## 📋 Table of Contents
+
+1. 🤖 [Introduction](#introduction)
+2. ⚙️ [Tech Stack](#tech-stack)
+3. 🔋 [Features](#features)
+4. 🤸 [Quick Start](#quick-start)
+
+## 🤖 Introduction
+
+A Next.js 14 platform focused on connecting tech professionals with impactful projects and opportunities.
+
+## ⚙️ Tech Stack
+
+- Next.js 14
+- TypeScript
+- Prisma
+- PostgreSQL
+- TailwindCSS
+- NextAuth.js
+- Vercel Blob Storage
+
+## 🔋 Features
+
+👉 **Authentication**: Google OAuth integration for secure user login
+
+👉 **Profile Management**: Create and manage professional profiles
+
+👉 **Project Submissions**: Submit and showcase tech projects
+
+👉 **File Upload**: Support for image uploads using Vercel Blob Storage
+
+👉 **Database Integration**: PostgreSQL with Prisma ORM for data management
+
+## 🤸 Quick Start
+
+Follow these steps to set up the project locally.
+
+**Prerequisites**
+
+- Git
+- Node.js
+- PostgreSQL
+
+**Cloning the Repository**
+
+```bash
+git clone https://github.com/your-repo/tech-impact-platform.git
+cd tech-impact-platform
+```
+
+**Installing Dependencies**
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+**Setting Up Environment Variables**
+
+Create a `.env` file in the root directory and add the following variables:
+
+```env
+DATABASE_URL=your_postgresql_database_url
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+**Running the Development Server**
 
 ```bash
 npm run dev
@@ -10,8 +89,6 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
