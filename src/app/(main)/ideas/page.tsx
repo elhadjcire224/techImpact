@@ -47,9 +47,15 @@ export default function IdeasPage() {
             <IdeaCardSkeleton key={i} />
           ))
         ) : (
-          ideas.map((idea) => (
-            <IdeaCard key={idea.id} idea={idea} />
-          ))
+          ideas.length === 0 ? (
+            <div className="col-span-full text-center py-8 text-muted-foreground">
+              No ideas created yet. Be the first to create one!
+            </div>
+          ) : (
+            ideas.map((idea) => (
+              <IdeaCard key={idea.id} idea={idea} />
+            ))
+          )
         )}
       </div>
 
