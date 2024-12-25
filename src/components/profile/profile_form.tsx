@@ -43,11 +43,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user.name || "",
-      github: user.github || "",
-      portfolio: user.portfolio || "",
-      phone: user.phone || "",
-      bio: user.bio || "",
+      name: user.name || undefined,
+      github: user.github || undefined,
+      portfolio: user.portfolio || undefined,
+      phone: user.phone || undefined,
+      bio: user.bio || undefined,
       skills: user.skills.map(s => s.skill),
     },
   })
