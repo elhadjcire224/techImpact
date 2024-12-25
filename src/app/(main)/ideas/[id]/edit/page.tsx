@@ -15,6 +15,7 @@ import { toast } from "react-hot-toast"
 import { TagSelect } from "@/components/ui/tag_select"
 import { ArrowLeft, Edit } from "lucide-react"
 import { useEffect, useState } from "react"
+import BacKButton from "@/components/back_button"
 
 const formSchema = z.object({
   title: z.string().min(10, "Title must be at least 10 characters"),
@@ -37,7 +38,7 @@ export default function EditIdeaPage({ params }: { params: Promise<{ id: string 
       try {
         const id = (await params).id
         const { comments, tags, ...ideaDetails } = await fetchIdeaById(id)
-        
+
         form.reset({
           title: ideaDetails.title,
           description: ideaDetails.description,
@@ -71,14 +72,7 @@ export default function EditIdeaPage({ params }: { params: Promise<{ id: string 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80 py-8">
       <div className="container max-w-4xl mx-auto">
-        <Button
-          variant="ghost"
-          className="mb-6 mt-4 text-muted-foreground hover:text-foreground"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
+        <BacKButton />
 
         <Card className="border-none shadow-lg bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <CardHeader className="space-y-4 pb-6">
