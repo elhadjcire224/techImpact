@@ -158,7 +158,7 @@ export async function createIdea({
   }
 
   try {
-    const idea = await prisma.idea.create({
+    await prisma.idea.create({
       data: {
         title,
         description,
@@ -337,7 +337,7 @@ export async function fetchIdeaById(ideaId: string) {
     });
 
     if (!idea) {
-      throw new Error('Idea not found');
+      return false
     }
 
     return {

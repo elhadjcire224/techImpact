@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useTags } from "@/hooks/use_tags"
 import { fetchIdeaById, updateIdea } from "@/lib/actions/ideas.actions"
-import { useRouter } from "next/navigation"
+import { notFound, useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
 import { TagSelect } from "@/components/ui/tag_select"
 import { ArrowLeft, Edit } from "lucide-react"
@@ -37,7 +37,10 @@ export default function EditIdeaPage({ params }: { params: Promise<{ id: string 
     async function loadIdea() {
       try {
         const id = (await params).id
-        const { comments, tags, ...ideaDetails } = await fetchIdeaById(id)
+        const result = await fetchIdeaById(id)
+        if (result === false) notFound()
+
+        const { comments, tags, ...ideaDetails } = result
 
         form.reset({
           title: ideaDetails.title,
