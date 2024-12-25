@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Roboto } from "next/font/google";
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 
@@ -38,7 +39,7 @@ export default async function RootLayout({
             <Toaster />
           </ThemeProvider>
         </SessionProvider>
-
+        <Analytics />
       </body>
     </html>
 
