@@ -31,7 +31,6 @@ export function useIdeasInfiniteScroll(
       });
 
       setIdeas(result.ideas as IdeaCard[]);
-      console.log(result)
       setHasMore(result.hasMore);
     } catch (error) {
       console.error("Error fetching ideas:", error);
