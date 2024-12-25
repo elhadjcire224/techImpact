@@ -12,6 +12,10 @@ const roboto = Roboto({ subsets: ["latin"], style: "normal", weight: ["100", "30
 export const metadata: Metadata = {
   title: "techImpact",
   description: "techImpact",
+  manifest: "/manifest.json",
+  icons: {
+    icon: 'logo.png'
+  }
 };
 
 export default async function RootLayout({
