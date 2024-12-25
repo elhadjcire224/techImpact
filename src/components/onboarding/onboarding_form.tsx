@@ -54,7 +54,7 @@ const formSchema = z.object({
   role: z.nativeEnum(UserRole, {
     required_error: "You need to select a role",
   }),
-  skills: z.array(z.string()).min(1, "Add at least one skill"),
+  skills: z.array(z.string(), { required_error: "selectionnez aut moins un skil" }).min(1, "Add at least one skill"),
 })
 
 export type onBoardingShemaType = z.infer<typeof formSchema>
